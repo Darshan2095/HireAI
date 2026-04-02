@@ -13,10 +13,19 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  accounts Account[]
-  sessions Session[]
+  role          Role      @default(USER)
+  resumeScore   Int?      
 
-  createdAt DateTime @default(now())
+  bio           String?
+  skills        String?
+  experience    String?
+
+  accounts      Account[]
+  sessions      Session[]
+  resumes       Resume[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
 }
 
 model Account {
@@ -53,4 +62,25 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Resume {
+  id           String   @id @default(cuid())
+  title        String?
+  fileUrl      String
+  score        Int?
+  feedback     String?
+  skills       String?
+  technologies String?
+  experience   String?
+  userId       String
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
