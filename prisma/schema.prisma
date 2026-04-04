@@ -23,6 +23,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   resumes       Resume[]
+  applications Application[]
+  interviews Interview[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
@@ -78,9 +80,62 @@ model Resume {
   skills       String?
   technologies String?
   experience   String?
+  improvements String?
+  keywords     String?
+  optimized    String?
   userId       String
+  jobs Job[]
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  title       String
+  company     String
+  description String
+  matchScore  Int?
+  applications Application[]
+
+  resumeId String
+  resume   Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Application {
+  id       String @id @default(cuid())
+
+  status   ApplicationStatus @default(APPLIED)
+
+  jobId    String
+  job      Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  userId   String
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+enum ApplicationStatus {
+  APPLIED
+  INTERVIEW
+  REJECTED
+  OFFER
+}
+
+model Interview {
+  id        String @id @default(cuid())
+
+  question  String
+  answer    String?
+  feedback  String?
+  score     Int?
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
