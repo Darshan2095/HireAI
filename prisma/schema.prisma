@@ -16,6 +16,8 @@ model User {
   role          Role      @default(USER)
   resumeScore   Int?      
 
+  username      String?  @unique
+
   bio           String?
   skills        String?
   experience    String?

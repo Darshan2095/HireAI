@@ -3,6 +3,7 @@ import { UserProfile } from "./user-profile";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
+
 export const Navbar = async () => {
   const user = await currentUser();
 
@@ -37,7 +38,8 @@ export const Navbar = async () => {
 
           <UserProfile 
             name={user?.name} 
-            image={user?.image} 
+            image={user?.image}
+            username={user?.username}
           />
         </div>
       </div>

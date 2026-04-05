@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { 
   FileText, Trash2, Sparkles, ExternalLink, 
-  Loader2, CheckCircle2, BrainCircuit, Wrench, 
+  Loader2, CheckCircle2, Wrench, 
   Calendar, Layers, Briefcase, ArrowRight,
-  TrendingUp, Hash, ClipboardCheck, Wand2
+  TrendingUp, Hash, ClipboardCheck, Wand2,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,6 @@ interface ResumeItemProps {
     skills?: string | null;
     technologies?: string | null;
     experience?: string | null;
-    // New Fields
     improvements?: string | null;
     keywords?: string | null;
     optimized?: string | null;
@@ -73,44 +73,65 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
     } catch (error) { alert("Analysis failed"); } finally { setLoading(false); }
   };
 
+  const handleDownload = async () => {
+    const res = await fetch("/api/resume/report", {
+      method: "POST",
+      body: JSON.stringify({ resumeId: resume.id }),
+    });
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Report_${resume.id.slice(-4)}.pdf`;
+    a.click();
+  };
+
   const score = resume.score ?? 0;
   const isAnalyzed = resume.score !== null && resume.score !== undefined;
 
   return (
     <div className={cn(
-      "group relative bg-card border border-border/50 rounded-[32px] overflow-hidden transition-all duration-500 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5",
+      "group relative bg-card border border-border/50 rounded-[24px] md:rounded-[32px] overflow-hidden transition-all duration-500 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5",
       (loading || isMatching || isImproving) && "ring-2 ring-primary/20 animate-pulse"
     )}>
       
       {/* 1. Main Action Row */}
-      <div className="p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-        <div className="flex items-center gap-6">
-          <div className="relative flex-shrink-0 h-20 w-20 flex items-center justify-center">
+      <div className="p-5 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 md:gap-8">
+        
+        {/* Header Section: Score + Info */}
+        <div className="flex items-start md:items-center gap-4 md:gap-6">
+          {/* Score Circle - Responsive Sizing */}
+          <div className="relative flex-shrink-0 h-16 w-16 md:h-20 md:w-20 flex items-center justify-center">
             <svg className="h-full w-full -rotate-90">
-              <circle cx="40" cy="40" r="36" fill="transparent" stroke="currentColor" strokeWidth="5" className="text-muted/10" />
+              <circle cx="32" cy="32" r="28" fill="transparent" stroke="currentColor" strokeWidth="4" className="text-muted/10 md:hidden" />
+              <circle cx="40" cy="40" r="36" fill="transparent" stroke="currentColor" strokeWidth="5" className="hidden md:block text-muted/10" />
+              
+              {/* Mobile Circle */}
+              <circle cx="32" cy="32" r="28" fill="transparent" stroke="currentColor" strokeWidth="4" 
+                strokeDasharray={175} 
+                strokeDashoffset={175 - (175 * score) / 100} 
+                className={cn("md:hidden transition-all duration-1000", score >= 80 ? "text-emerald-500" : score >= 60 ? "text-amber-500" : "text-rose-500", !isAnalyzed && "text-muted/20")} 
+              />
+              {/* Desktop Circle */}
               <circle cx="40" cy="40" r="36" fill="transparent" stroke="currentColor" strokeWidth="5" 
                 strokeDasharray={226} 
                 strokeDashoffset={226 - (226 * score) / 100} 
-                className={cn(
-                  "transition-all duration-1000 ease-out",
-                  score >= 80 ? "text-emerald-500" : score >= 60 ? "text-amber-500" : "text-rose-500",
-                  !isAnalyzed && "text-muted/20"
-                )} 
+                className={cn("hidden md:block transition-all duration-1000", score >= 80 ? "text-emerald-500" : score >= 60 ? "text-amber-500" : "text-rose-500", !isAnalyzed && "text-muted/20")} 
               />
             </svg>
             <div className="absolute flex flex-col items-center">
-              <span className="text-xl font-black tracking-tighter">{isAnalyzed ? `${score}%` : "--"}</span>
-              {isAnalyzed && <span className="text-[8px] font-bold uppercase text-muted-foreground">Match</span>}
+              <span className="text-base md:text-xl font-black tracking-tighter">{isAnalyzed ? `${score}%` : "--"}</span>
+              {isAnalyzed && <span className="text-[7px] md:text-[8px] font-bold uppercase text-muted-foreground">Match</span>}
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Link href={resume.fileUrl} target="_blank" className="text-lg font-bold flex items-center gap-2 group/link">
-              <span className="bg-primary/10 p-1.5 rounded-lg"><FileText className="h-4 w-4 text-primary" /></span>
-              <span className="group-hover/link:text-primary transition-colors truncate max-w-[200px] md:max-w-md">Resume_Analysis_{resume.id.slice(-4)}</span>
-              <ExternalLink className="h-3 w-3 opacity-0 group-hover/link:opacity-100 transition-all" />
+          <div className="space-y-1.5 min-w-0 flex-1">
+            <Link href={resume.fileUrl} target="_blank" className="text-base md:text-lg font-bold flex items-center gap-2 group/link">
+              <span className="bg-primary/10 p-1.5 rounded-lg shrink-0"><FileText className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" /></span>
+              <span className="group-hover/link:text-primary transition-colors truncate block max-w-[180px] md:max-w-md">Resume_{resume.id.slice(-4)}</span>
+              <ExternalLink className="h-3 w-3 opacity-0 group-hover/link:opacity-100 transition-all hidden md:block" />
             </Link>
-            <div className="flex items-center gap-4 text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+            <div className="flex items-center gap-3 md:gap-4 text-[10px] md:text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
               <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 opacity-70" /> {new Date(resume.createdAt).toLocaleDateString()}</span>
               <span className="h-1 w-1 rounded-full bg-border" />
               <span className="flex items-center gap-1.5"><Layers className="h-3.5 w-3.5 opacity-70" /> PDF</span>
@@ -118,42 +139,63 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 self-end lg:self-center">
+        {/* Button Group: Grid on Mobile, Flex on Desktop */}
+        <div className="grid grid-cols-2 lg:flex lg:flex-wrap items-center gap-2 md:gap-3 self-stretch lg:self-center">
           {isAnalyzed ? (
             <>
+              <Button
+                onClick={handleDownload}
+                variant="outline"
+                className="rounded-xl md:rounded-full px-4 h-11 md:h-10 border-indigo-200 hover:bg-indigo-50 text-indigo-600 gap-2 transition-all active:scale-95 order-3 md:order-1"
+              >
+                <Download className="h-4 w-4" />
+                <span className="md:inline">Report</span>
+              </Button>
+              
               <Button 
                 onClick={handleImprove}
                 disabled={isImproving}
                 variant="outline"
-                className="rounded-full px-5 border-purple-200 hover:bg-purple-50 text-purple-700 gap-2 transition-all active:scale-95"
+                className="rounded-xl md:rounded-full px-4 h-11 md:h-10 border-purple-200 hover:bg-purple-50 text-purple-700 gap-2 transition-all active:scale-95 order-4 md:order-2"
               >
                 {isImproving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                Optimize
+                <span className="md:inline">Optimize</span>
               </Button>
+
               <Button 
                 onClick={handleMatch} 
                 disabled={isMatching}
-                className="rounded-full px-6 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 gap-2 group/match"
+                className="col-span-2 lg:col-auto rounded-xl md:rounded-full px-6 h-12 md:h-10 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 gap-2 group/match order-1 md:order-3"
               >
                 {isMatching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Briefcase className="h-4 w-4" />}
                 Find Matches
-                <ArrowRight className="h-4 w-4 transition-transform group-hover/match:translate-x-1" />
+                <ArrowRight className="h-4 w-4 transition-transform group-hover/match:translate-x-1 hidden md:block" />
               </Button>
             </>
           ) : (
-            <Button onClick={handleAnalyze} disabled={loading} className="rounded-full px-8 bg-primary shadow-lg shadow-primary/20 gap-2">
+            <Button onClick={handleAnalyze} disabled={loading} className="w-full lg:w-auto rounded-xl md:rounded-full px-8 h-12 md:h-10 bg-primary shadow-lg shadow-primary/20 gap-2">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               Analyze with AI
             </Button>
           )}
-          <Button onClick={handleDelete} disabled={isDeleting} size="icon" variant="ghost" className="rounded-full text-muted-foreground hover:text-rose-600 hover:bg-rose-50"><Trash2 className="h-5 w-5" /></Button>
+          
+          {/* Delete button positioning */}
+          <Button 
+            onClick={handleDelete} 
+            disabled={isDeleting} 
+            size="icon" 
+            variant="ghost" 
+            className="absolute top-4 right-4 md:static rounded-full text-muted-foreground hover:text-rose-600 hover:bg-rose-50 order-2 md:order-4"
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
       {/* 2. Intelligence Section */}
       {isAnalyzed && (
-        <div className="px-8 pb-8 space-y-6 animate-in fade-in duration-700">
-          <div className="rounded-[28px] bg-muted/20 border border-border/30 p-6 space-y-8">
+        <div className="px-5 pb-5 md:px-8 md:pb-8 space-y-6 animate-in fade-in duration-700">
+          <div className="rounded-[20px] md:rounded-[28px] bg-muted/20 border border-border/30 p-5 md:p-6 space-y-8">
             
             {/* Row 1: Skills & Ecosystem */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -163,7 +205,7 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {resume.skills?.split(',').map((skill, i) => (
-                    <Badge key={i} variant="secondary" className="bg-background/80 text-[10px] font-bold px-3 py-0.5 rounded-md border-none">{skill.trim()}</Badge>
+                    <Badge key={i} variant="secondary" className="bg-background/80 text-[9px] md:text-[10px] font-bold px-2 md:px-3 py-0.5 rounded-md border-none">{skill.trim()}</Badge>
                   ))}
                 </div>
               </div>
@@ -173,7 +215,7 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {resume.technologies?.split(',').map((tech, i) => (
-                    <Badge key={i} variant="outline" className="bg-blue-500/5 border-blue-200 text-blue-700 text-[10px] font-bold px-3 py-0.5 rounded-md">{tech.trim()}</Badge>
+                    <Badge key={i} variant="outline" className="bg-blue-500/5 border-blue-200 text-blue-700 text-[9px] md:text-[10px] font-bold px-2 md:px-3 py-0.5 rounded-md">{tech.trim()}</Badge>
                   ))}
                 </div>
               </div>
@@ -181,14 +223,14 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
 
             <Separator className="bg-border/40" />
 
-            {/* Row 2: Improvements & Keywords (The New Stuff) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Row 2: Improvements & Keywords */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               {resume.improvements && (
                 <div className="space-y-3 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
                   <p className="text-[10px] font-black uppercase text-amber-700 tracking-widest flex items-center gap-2">
                     <TrendingUp className="h-3.5 w-3.5" /> Growth Areas
                   </p>
-                  <p className="text-sm text-amber-900/80 leading-relaxed font-medium italic">
+                  <p className="text-xs md:text-sm text-amber-900/80 leading-relaxed font-medium italic">
                     {resume.improvements}
                   </p>
                 </div>
@@ -200,7 +242,7 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {resume.keywords.split(',').map((kw, i) => (
-                      <span key={i} className="text-[11px] font-bold text-primary/70">#{kw.trim()}</span>
+                      <span key={i} className="text-[10px] md:text-[11px] font-bold text-primary/70">#{kw.trim()}</span>
                     ))}
                   </div>
                 </div>
@@ -209,11 +251,11 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
 
             {/* Row 3: Optimized Summary */}
             {resume.optimized && (
-              <div className="space-y-3 bg-background/50 border border-border/40 rounded-2xl p-5 shadow-inner">
+              <div className="space-y-3 bg-background/50 border border-border/40 rounded-2xl p-4 md:p-5 shadow-inner">
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
                   <ClipboardCheck className="h-3.5 w-3.5 text-emerald-500" /> AI-Optimized Professional Summary
                 </p>
-                <p className="text-sm text-foreground/70 leading-relaxed">
+                <p className="text-xs md:text-sm text-foreground/70 leading-relaxed">
                   {resume.optimized}
                 </p>
               </div>
@@ -224,12 +266,12 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
 
       {/* 3. Full-Screen AI Overlays */}
       {(loading || isMatching || isImproving) && (
-        <div className="absolute inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in">
+        <div className="absolute inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in px-6">
           <div className="flex flex-col items-center gap-6 text-center max-w-sm">
-             <div className="h-20 w-20 rounded-full border-4 border-primary/10 border-t-primary animate-spin flex items-center justify-center">
-                <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+             <div className="h-16 w-16 md:h-20 md:w-20 rounded-full border-4 border-primary/10 border-t-primary animate-spin flex items-center justify-center">
+                <Sparkles className="h-6 w-6 md:h-8 md:w-8 text-primary animate-pulse" />
              </div>
-             <p className="text-lg font-bold tracking-tight">
+             <p className="text-base md:text-lg font-bold tracking-tight">
                 {loading && "Analyzing Profile..."}
                 {isMatching && "Sourcing Career Matches..."}
                 {isImproving && "Generating Optimizations..."}

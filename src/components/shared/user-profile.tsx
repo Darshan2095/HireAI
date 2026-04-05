@@ -9,15 +9,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/features/auth/components/logout-button";
-import { User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { User, Link as LinkIcon, LogOut, ChevronDown } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface UserProfileProps {
   name?: string | null;
   image?: string | null;
+  username?: string | null;
 }
 
-export const UserProfile = ({ name, image }: UserProfileProps) => {
+export const UserProfile = ({ name, image, username }: UserProfileProps) => {
   // Extract the first letter for a clean fallback avatar
   const initials = name?.charAt(0)?.toUpperCase() || "U";
 
@@ -54,10 +56,13 @@ export const UserProfile = ({ name, image }: UserProfileProps) => {
         
         {/* Header Section */}
         <DropdownMenuLabel className="font-normal p-2">
+          <Link href={"/dashboard"}>
+          
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none text-foreground">{name || "User"}</p>
             <p className="text-xs leading-none text-muted-foreground mt-1">Free Plan</p>
           </div>
+          </Link>
         </DropdownMenuLabel>
         
         <DropdownMenuSeparator className="bg-border/60" />
@@ -65,13 +70,19 @@ export const UserProfile = ({ name, image }: UserProfileProps) => {
         {/* Menu Items with Icons */}
         <DropdownMenuItem className="cursor-pointer rounded-lg px-3 py-2.5 text-sm hover:bg-secondary transition-colors">
           <User className="mr-2 h-4 w-4 text-muted-foreground" />
+          <Link href={"/profile"}>
           <span>Profile</span>
+          </Link>
         </DropdownMenuItem>
         
-        <DropdownMenuItem className="cursor-pointer rounded-lg px-3 py-2.5 text-sm hover:bg-secondary transition-colors">
-          <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
-          <span>Settings</span>
-        </DropdownMenuItem>
+        {username && (
+          <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 text-sm hover:bg-secondary transition-colors">
+            <Link href={`/u/${username}`}>
+              <LinkIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>Public Profile</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         
         <DropdownMenuSeparator className="bg-border/60" />
         

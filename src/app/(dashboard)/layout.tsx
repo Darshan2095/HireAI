@@ -28,8 +28,10 @@ export default async function DashboardLayout({
           <Sidebar />
         </aside>
 
+        <Sidebar mobile />
+
         {/* 3. Main Content - Scrollable Area */}
-        <main className="flex-1 overflow-y-auto relative custom-scrollbar">
+        <main className="flex-1 overflow-y-auto relative custom-scrollbar pb-24 md:pb-0">
           {/* Subtle Background Glow for Depth */}
           <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
             <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]" />
@@ -37,7 +39,7 @@ export default async function DashboardLayout({
           </div>
 
           {/* Content Wrapper with consistent padding */}
-          <div className="h-full w-full max-w-7xl mx-auto px-4 py-8 md:px-8 lg:px-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
+           <div className="h-full w-full max-w-7xl mx-auto px-4 py-8 md:px-8 lg:px-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
              {children}
           </div>
 
