@@ -69,9 +69,18 @@ In Vercel Project Settings → Environment Variables, add:
 1. Click "Deploy"
 2. Vercel will:
    - Run `npm ci` to install dependencies
+   - Run `prisma generate` via `postinstall`
    - Run `next build` to compile your Next.js app
-   - Run Prisma generate automatically
    - Deploy to production
+
+### Step 4.1: Apply Prisma Migrations (Recommended)
+After first deployment, run:
+
+```bash
+npm run db:migrate:deploy
+```
+
+This applies pending Prisma migrations safely in production.
 
 ### Step 5: Verify Deployment
 - [ ] Check deployment logs in Vercel dashboard
@@ -86,6 +95,7 @@ In Vercel Project Settings → Environment Variables, add:
 - Ensure DATABASE_URL is correctly copied to Vercel environment variables
 - Check PostgreSQL firewall/security rules allow Vercel IPs
 - Verify Prisma adapter configuration in `src/database/prisma.ts`
+- Prefer `sslmode=verify-full` in `DATABASE_URL` for stronger SSL behavior in production.
 
 ### GitHub OAuth Issues
 - Verify NEXTAUTH_URL matches your production domain

@@ -56,7 +56,13 @@ export default async function JobsPage() {
       {jobs.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map((job) => (
-            <JobItem key={job.id} job={job} />
+            <JobItem
+              key={job.id}
+              job={{
+                ...job,
+                matchScore: job.matchScore ?? 0,
+              }}
+            />
           ))}
         </div>
       ) : (

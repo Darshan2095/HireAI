@@ -6,6 +6,10 @@ import { Sparkles } from "lucide-react";
 
 export const Navbar = async () => {
   const user = await currentUser();
+  const username =
+    user && typeof user === "object" && "username" in user
+      ? ((user.username as string | null | undefined) ?? null)
+      : null;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md transition-all">
@@ -39,7 +43,7 @@ export const Navbar = async () => {
           <UserProfile 
             name={user?.name} 
             image={user?.image}
-            username={user?.username}
+            username={username}
           />
         </div>
       </div>
