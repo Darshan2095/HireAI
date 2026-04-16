@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/database/prisma";
 import { redirect } from "next/navigation";
-import { AddJob } from "@/features/admin/components/add-job";
 
 export default async function AdminPage() {
     const session = await auth();
@@ -21,9 +20,11 @@ export default async function AdminPage() {
     }
 
     return (
-        <div>
-           
-            <AddJob />
+        <div className="p-6 rounded border space-y-2">
+            <h1 className="text-xl font-semibold">Admin Panel</h1>
+            <p className="text-sm text-muted-foreground">
+                Job posting is available only in the company dashboard.
+            </p>
         </div>
     );
 }
