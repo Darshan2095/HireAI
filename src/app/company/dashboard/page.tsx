@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { prisma } from "@/database/prisma";
 import { 
   Briefcase, 
@@ -144,7 +145,19 @@ export default async function CompanyDashboard() {
     );
 }
 
-function StatCard({ label, value, icon, trend, subValue }: any) {
+function StatCard({
+  label,
+  value,
+  icon,
+  trend,
+  subValue,
+}: {
+  label: string;
+  value: ReactNode;
+  icon: ReactNode;
+  trend: string;
+  subValue?: string;
+}) {
     return (
         <div className="bg-white p-6 rounded-[28px] border border-slate-200/60 shadow-sm hover:shadow-md transition-all group">
             <div className="flex justify-between items-start mb-4">
@@ -166,7 +179,21 @@ function StatCard({ label, value, icon, trend, subValue }: any) {
     );
 }
 
-function ActionCard({ href, title, desc, icon, bgColor, darkText }: any) {
+function ActionCard({
+  href,
+  title,
+  desc,
+  icon,
+  bgColor,
+  darkText,
+}: {
+  href: string;
+  title: string;
+  desc: string;
+  icon: ReactNode;
+  bgColor: string;
+  darkText?: boolean;
+}) {
     return (
         <Link href={href} className="block group">
             <div className="p-6 rounded-[32px] bg-white border border-slate-200/60 shadow-sm hover:border-primary/50 transition-all relative overflow-hidden">

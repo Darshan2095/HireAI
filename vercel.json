@@ -1,9 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "next build",
-  "installCommand": "npm ci",
-  "nodeVersion": "20.x",
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "envPrefix": "NEXT_PUBLIC_,DATABASE_URL,GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,AUTH_SECRET,AUTH_URL,GEMINI_API_KEY,UPLOADTHING_TOKEN,UPLOADTHING_SECRET,UPLOADTHING_APP_ID"
+  "installCommand": "npm ci"
 }

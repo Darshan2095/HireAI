@@ -140,7 +140,7 @@ export const InterviewItem = ({ interview }: InterviewItemProps) => {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                 <div className="md:col-span-8 bg-background/50 rounded-2xl p-5 border border-border/40">
                   <p className="text-sm leading-relaxed text-foreground/80 italic">
-                    "{interview.feedback}"
+                    &ldquo;{interview.feedback}&rdquo;
                   </p>
                 </div>
                 <div className="md:col-span-4 flex flex-col gap-3">

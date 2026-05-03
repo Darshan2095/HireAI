@@ -18,9 +18,11 @@ import {
   UserPlus,
   Building2,
   ClipboardList,
+  Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import type { ApplicationStatus } from "@prisma/client";
 
 export default async function AdminDashboard() {
   const session = await auth();
@@ -112,15 +114,21 @@ export default async function AdminDashboard() {
     }),
   ]);
 
+  const countByStatus = (st: ApplicationStatus) =>
+    applicationStats.find((s) => s.status === st)?._count.id ?? 0;
+
   const statusMap = {
-    PENDING: applicationStats.find((s) => s.status === "PENDING")?._count.id ?? 0,
-    APPROVED: applicationStats.find((s) => s.status === "APPROVED")?._count.id ?? 0,
-    REJECTED: applicationStats.find((s) => s.status === "REJECTED")?._count.id ?? 0,
+    APPLIED: countByStatus("APPLIED"),
+    INTERVIEW: countByStatus("INTERVIEW"),
+    OFFER: countByStatus("OFFER"),
+    REJECTED: countByStatus("REJECTED"),
   };
 
-  const approvalRate =
+  const pipelineRate =
     totalApplications > 0
-      ? Math.round((statusMap.APPROVED / totalApplications) * 100)
+      ? Math.round(
+          ((statusMap.INTERVIEW + statusMap.OFFER) / totalApplications) * 100,
+        )
       : 0;
 
   return (
@@ -162,8 +170,8 @@ export default async function AdminDashboard() {
                   icon={<Briefcase className="h-4 w-4" />}
                 />
                 <HeroStat
-                  label="Approval rate"
-                  value={`${approvalRate}%`}
+                  label="Pipeline rate"
+                  value={`${pipelineRate}%`}
                   icon={<Sparkles className="h-4 w-4" />}
                 />
               </div>
@@ -219,14 +227,20 @@ export default async function AdminDashboard() {
             />
             <div className="mt-6 space-y-3">
               <StatusRow
-                label="Pending"
-                value={statusMap.PENDING}
+                label="Applied"
+                value={statusMap.APPLIED}
                 icon={<Clock className="h-4 w-4 text-amber-500" />}
                 color="amber"
               />
               <StatusRow
-                label="Approved"
-                value={statusMap.APPROVED}
+                label="Interview"
+                value={statusMap.INTERVIEW}
+                icon={<Calendar className="h-4 w-4 text-violet-500" />}
+                color="violet"
+              />
+              <StatusRow
+                label="Offer"
+                value={statusMap.OFFER}
                 icon={<CheckCircle2 className="h-4 w-4 text-emerald-500" />}
                 color="emerald"
               />
@@ -620,12 +634,13 @@ function StatusRow({
   label: string;
   value: number;
   icon: React.ReactNode;
-  color: "amber" | "emerald" | "rose";
+  color: "amber" | "emerald" | "rose" | "violet";
 }) {
   const barStyles = {
     amber: "from-amber-400 to-amber-500 bg-amber-50",
     emerald: "from-emerald-400 to-emerald-500 bg-emerald-50",
     rose: "from-rose-400 to-rose-500 bg-rose-50",
+    violet: "from-violet-400 to-violet-500 bg-violet-50",
   };
 
   return (
@@ -650,15 +665,19 @@ function StatusRow({
   );
 }
 
-function ApplicationStatusBadge({
-  status,
-}: {
-  status: "PENDING" | "APPROVED" | "REJECTED";
-}) {
-  if (status === "APPROVED") {
+function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
+  if (status === "OFFER") {
     return (
       <Badge className="rounded-full border-0 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
-        Approved
+        Offer
+      </Badge>
+    );
+  }
+
+  if (status === "INTERVIEW") {
+    return (
+      <Badge className="rounded-full border-0 bg-violet-100 text-violet-700 hover:bg-violet-100">
+        Interview
       </Badge>
     );
   }
@@ -673,7 +692,7 @@ function ApplicationStatusBadge({
 
   return (
     <Badge className="rounded-full border-0 bg-amber-100 text-amber-700 hover:bg-amber-100">
-      Pending
+      Applied
     </Badge>
   );
 }

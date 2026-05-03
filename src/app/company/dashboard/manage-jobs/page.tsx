@@ -99,7 +99,7 @@ export default async function ManageJobsPage() {
                   {/* Job Briefing */}
                   <div className="bg-slate-50/50 p-4 rounded-2xl">
                     <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Description Snippet</p>
-                    <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed italic">"{job.description}"</p>
+                    <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed italic">&ldquo;{job.description}&rdquo;</p>
                   </div>
 
                   {/* Applicant Ranking System */}

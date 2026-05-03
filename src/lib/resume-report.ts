@@ -35,7 +35,15 @@ const wrapText = (text: string, font: { widthOfTextAtSize: (value: string, size:
   return lines;
 };
 
-export const generateResumePDF = async (resume: any) => {
+export type ResumeReportFields = {
+  score?: unknown;
+  feedback?: unknown;
+  skills?: unknown;
+  technologies?: unknown;
+  experience?: unknown;
+};
+
+export const generateResumePDF = async (resume: ResumeReportFields) => {
   const pdfDoc = await PDFDocument.create();
   const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);

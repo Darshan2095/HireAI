@@ -2,7 +2,15 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export default function JobList({ initialJobs, company }: { initialJobs: any[]; company: string }) {
+type JobRow = { id: string; title: string; description: string };
+
+export default function JobList({
+  initialJobs,
+  company,
+}: {
+  initialJobs: JobRow[];
+  company: string;
+}) {
   const [jobs, setJobs] = useState(initialJobs || []);
   const [loading, setLoading] = useState(false);
 

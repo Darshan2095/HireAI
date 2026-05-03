@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -11,32 +9,37 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import type { TooltipProps } from "recharts";
 import { TrendingUp, Award, Calendar } from "lucide-react";
 
-export const InterviewChart = ({ data }: any) => {
-  // Custom Tooltip for a "SaaS" look
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-background/95 backdrop-blur-md border border-border/50 p-4 rounded-2xl shadow-xl">
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-            {label}
-          </p>
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-primary" />
-            <p className="text-sm font-bold text-foreground">
-              Score: <span className="text-primary">{payload[0].value}%</span>
-            </p>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
+export type InterviewChartPoint = { date: string; score: number };
 
+function InterviewChartTooltip({
+  active,
+  payload,
+  label,
+}: TooltipProps<number, string>) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background/95 backdrop-blur-md border border-border/50 p-4 rounded-2xl shadow-xl">
+        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+          {label}
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-primary" />
+          <p className="text-sm font-bold text-foreground">
+            Score: <span className="text-primary">{payload[0].value}%</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
+export function InterviewChart({ data }: { data: InterviewChartPoint[] }) {
   return (
     <div className="group bg-card border border-border/60 rounded-[32px] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
-      
       {/* Header with Stats */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div className="space-y-1">
@@ -45,7 +48,10 @@ export const InterviewChart = ({ data }: any) => {
             Growth Analytics
           </div>
           <h2 className="text-2xl font-black tracking-tight">
-            Performance <span className="text-muted-foreground/50 italic font-medium">History</span>
+            Performance{" "}
+            <span className="text-muted-foreground/50 italic font-medium">
+              History
+            </span>
           </h2>
         </div>
 
@@ -60,39 +66,65 @@ export const InterviewChart = ({ data }: any) => {
       {/* Chart Area */}
       <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                <stop
+                  offset="5%"
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0.3}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0}
+                />
               </linearGradient>
             </defs>
-            
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              vertical={false} 
-              stroke="hsl(var(--border))" 
-              opacity={0.5} 
+
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="hsl(var(--border))"
+              opacity={0.5}
             />
-            
-            <XAxis 
-              dataKey="date" 
+
+            <XAxis
+              dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 600 }}
+              tick={{
+                fill: "hsl(var(--muted-foreground))",
+                fontSize: 10,
+                fontWeight: 600,
+              }}
               dy={10}
             />
-            
-            <YAxis 
+
+            <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 600 }}
+              tick={{
+                fill: "hsl(var(--muted-foreground))",
+                fontSize: 10,
+                fontWeight: 600,
+              }}
               domain={[0, 100]}
               tickCount={6}
             />
-            
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }} />
-            
+
+            <Tooltip
+              content={InterviewChartTooltip}
+              cursor={{
+                stroke: "hsl(var(--primary))",
+                strokeWidth: 1,
+                strokeDasharray: "4 4",
+              }}
+            />
+
             <Area
               type="monotone"
               dataKey="score"
@@ -116,4 +148,4 @@ export const InterviewChart = ({ data }: any) => {
       </div>
     </div>
   );
-};
+}

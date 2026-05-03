@@ -53,7 +53,7 @@ export default function ResumePage() {
         <div className="space-y-1">
           <h4 className="text-xs font-bold text-blue-700 uppercase tracking-wide">Pro Tip</h4>
           <p className="text-xs text-blue-600/80 leading-relaxed">
-            For the best AI accuracy, ensure your PDF is text-selectable and doesn't contain heavy graphics or multi-column layouts.
+            For the best AI accuracy, ensure your PDF is text-selectable and doesn&apos;t contain heavy graphics or multi-column layouts.
           </p>
         </div>
       </div>

@@ -24,7 +24,7 @@ export default async function JobsPage() {
             Job <span className="text-primary">Matches</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-md">
-            We've analyzed your latest resume to find roles where your tech stack shines brightest.
+            We&apos;ve analyzed your latest resume to find roles where your tech stack shines brightest.
           </p>
         </div>
 

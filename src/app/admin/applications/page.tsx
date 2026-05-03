@@ -14,6 +14,7 @@ import {
   Building2,
   SearchCheck,
 } from "lucide-react";
+import type { ApplicationStatus } from "@prisma/client";
 
 export default async function AdminApplicationsPage() {
   const session = await auth();
@@ -40,13 +41,15 @@ export default async function AdminApplicationsPage() {
 
   const stats = {
     total: allApplications.length,
-    pending: allApplications.filter((a) => a.status === "PENDING").length,
-    approved: allApplications.filter((a) => a.status === "APPROVED").length,
+    applied: allApplications.filter((a) => a.status === "APPLIED").length,
+    inPipeline: allApplications.filter(
+      (a) => a.status === "INTERVIEW" || a.status === "OFFER",
+    ).length,
     rejected: allApplications.filter((a) => a.status === "REJECTED").length,
   };
 
-  const approvalRate =
-    stats.total > 0 ? Math.round((stats.approved / stats.total) * 100) : 0;
+  const pipelineRate =
+    stats.total > 0 ? Math.round((stats.inPipeline / stats.total) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-slate-50/60">
@@ -88,13 +91,13 @@ export default async function AdminApplicationsPage() {
                   icon={<FileText className="h-4 w-4" />}
                 />
                 <HeroMiniStat
-                  label="Approved"
-                  value={stats.approved}
+                  label="Interview / offer"
+                  value={stats.inPipeline}
                   icon={<CheckCircle2 className="h-4 w-4" />}
                 />
                 <HeroMiniStat
-                  label="Rate"
-                  value={`${approvalRate}%`}
+                  label="Pipeline rate"
+                  value={`${pipelineRate}%`}
                   icon={<ArrowUpRight className="h-4 w-4" />}
                 />
               </div>
@@ -112,17 +115,17 @@ export default async function AdminApplicationsPage() {
             tone="slate"
           />
           <StatsCard
-            label="Pending review"
-            value={stats.pending}
+            label="Applied"
+            value={stats.applied}
             icon={<Clock className="h-5 w-5" />}
-            hint="Awaiting decision"
+            hint="Submitted, not yet advanced"
             tone="amber"
           />
           <StatsCard
-            label="Approved"
-            value={stats.approved}
+            label="Interview / offer"
+            value={stats.inPipeline}
             icon={<CheckCircle2 className="h-5 w-5" />}
-            hint="Accepted applications"
+            hint="Interview stage or offer extended"
             tone="emerald"
           />
           <StatsCard
@@ -324,15 +327,19 @@ function StatsCard({
   );
 }
 
-function ApplicationStatusBadge({
-  status,
-}: {
-  status: "PENDING" | "APPROVED" | "REJECTED";
-}) {
-  if (status === "APPROVED") {
+function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
+  if (status === "OFFER") {
     return (
       <Badge className="rounded-full border-0 bg-emerald-100 px-3 py-1 text-emerald-700 hover:bg-emerald-100">
-        Approved
+        Offer
+      </Badge>
+    );
+  }
+
+  if (status === "INTERVIEW") {
+    return (
+      <Badge className="rounded-full border-0 bg-violet-100 px-3 py-1 text-violet-700 hover:bg-violet-100">
+        Interview
       </Badge>
     );
   }
@@ -347,7 +354,7 @@ function ApplicationStatusBadge({
 
   return (
     <Badge className="rounded-full border-0 bg-amber-100 px-3 py-1 text-amber-700 hover:bg-amber-100">
-      Pending
+      Applied
     </Badge>
   );
 }

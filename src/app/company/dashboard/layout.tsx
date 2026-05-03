@@ -53,7 +53,7 @@ export default function CompanyDashboardLayout({
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">Recruiter Hub</h1>
-              <p className="text-sm text-slate-500">Manage your company's hiring pipeline</p>
+              <p className="text-sm text-slate-500">Manage your company&apos;s hiring pipeline</p>
             </div>
           </div>
         </div>
