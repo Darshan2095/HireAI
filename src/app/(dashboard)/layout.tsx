@@ -3,6 +3,7 @@ import { Navbar } from "@/components/shared/navbar";
 import { Sidebar } from "@/components/shared/sidebar";
 import { redirect } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { prisma } from "@/database/prisma";
 
 export default async function DashboardLayout({
   children,
@@ -12,7 +13,19 @@ export default async function DashboardLayout({
   const session = await auth();
 
   if (!session) {
-    redirect("/login");
+    redirect("/login-select");
+  }
+
+  // Verify user exists and get their role
+  let userRole = "USER";
+  if (session.user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { role: true },
+    });
+    if (user) {
+      userRole = user.role;
+    }
   }
 
   return (

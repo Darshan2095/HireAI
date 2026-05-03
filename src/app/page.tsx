@@ -36,7 +36,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden sm:block">
+            <Link href="/login-select" className="hidden sm:block">
               <Button variant="ghost" className="text-slate-600 font-semibold hover:text-primary">
                 Login
               </Button>
