@@ -1,10 +1,10 @@
 import { prisma } from "@/database/prisma";
 
-type RouteContext = { params: { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 export async function DELETE(_req: Request, context: RouteContext) {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     const job = await prisma.job.findUnique({ where: { id } });
     if (!job) return new Response("Not found", { status: 404 });
 
@@ -18,7 +18,7 @@ export async function DELETE(_req: Request, context: RouteContext) {
 
 export async function PUT(req: Request, context: RouteContext) {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     const body = await req.json();
     const title = typeof body?.title === "string" ? body.title.trim() : undefined;
     const description = typeof body?.description === "string" ? body.description.trim() : undefined;
@@ -35,7 +35,7 @@ export async function PUT(req: Request, context: RouteContext) {
 
 export async function GET(_req: Request, context: RouteContext) {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     const job = await prisma.job.findUnique({ where: { id } });
     if (!job) return new Response("Not found", { status: 404 });
     return new Response(JSON.stringify(job));
