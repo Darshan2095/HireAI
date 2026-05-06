@@ -4,6 +4,9 @@ type ResumeAnalysisResult = {
   skills: string;
   technologies: string;
   experience: string;
+  improvements: string;
+  keywords: string;
+  optimized: string;
 };
 
 const API_VERSIONS = ["v1", "v1beta"] as const;
@@ -85,35 +88,41 @@ export const analyzeResume = async (text: string): Promise<ResumeAnalysisResult>
 Return ONLY valid JSON:
 
 {
-"score": number,
+"score": number 0-100,
 "feedback": string,
-"skills": string,
-"technologies": string,
-"experience": string
+"skills": string (comma-separated core skills),
+"technologies": string (comma-separated tech stack),
+"experience": string,
+"improvements": string (specific areas to improve),
+"keywords": string (comma-separated ATS keywords),
+"optimized": string
 }
 
 Resume:
 ${text}
 `;
 
-  const content = await tryGenerateWithFallback(prompt);
-  const normalized = content
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
-
   try {
+    const content = await tryGenerateWithFallback(prompt);
+    const normalized = content
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/, "")
+      .trim();
+
     return JSON.parse(normalized);
   } catch (error) {
-    console.error("AI parsing error:", error);
+    console.error("AI analysis fallback used:", error);
 
     return {
       score: 60,
-      feedback: "Resume analyzed but formatting issue",
+      feedback: "Resume analyzed with fallback formatting",
       skills: "",
       technologies: "",
       experience: "",
+      improvements: "Unable to generate improvements at this time",
+      keywords: "",
+      optimized: "",
     };
   }
 };

@@ -18,7 +18,7 @@ function InterviewChartTooltip({
   active,
   payload,
   label,
-}: TooltipProps<number, string>) {
+}: any) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background/95 backdrop-blur-md border border-border/50 p-4 rounded-2xl shadow-xl">

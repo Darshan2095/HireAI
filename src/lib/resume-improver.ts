@@ -85,18 +85,20 @@ Resume:
 ${text}
 `;
 
-  const content = await tryGenerateWithFallback(prompt);
-  const normalized = content
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
-
   try {
+    const content = await tryGenerateWithFallback(prompt);
+    const normalized = content
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/, "")
+      .trim();
+
     return JSON.parse(normalized);
-  } catch {
+  } catch (error) {
+    console.error("AI improvement fallback used:", error);
+
     return {
-      improvements: "",
+      improvements: "Unable to generate improvements at this time",
       keywords: "",
       optimized: "",
     };

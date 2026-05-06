@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   FileText, Trash2, Sparkles, ExternalLink, 
   Loader2, CheckCircle2, Wrench, 
@@ -37,6 +37,13 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
   const [isMatching, setIsMatching] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isImproving, setIsImproving] = useState(false);
+  const [formattedDate, setFormattedDate] = useState<string>("");
+
+  useEffect(() => {
+    // Format date on client to avoid hydration mismatch
+    const date = new Date(resume.createdAt);
+    setFormattedDate(date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }));
+  }, [resume.createdAt]);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -132,7 +139,7 @@ export const ResumeItem = ({ resume }: ResumeItemProps) => {
               <ExternalLink className="h-3 w-3 opacity-0 group-hover/link:opacity-100 transition-all hidden md:block" />
             </Link>
             <div className="flex items-center gap-3 md:gap-4 text-[10px] md:text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
-              <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 opacity-70" /> {new Date(resume.createdAt).toLocaleDateString()}</span>
+              <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 opacity-70" /> {formattedDate || "Loading..."}</span>
               <span className="h-1 w-1 rounded-full bg-border" />
               <span className="flex items-center gap-1.5"><Layers className="h-3.5 w-3.5 opacity-70" /> PDF</span>
             </div>

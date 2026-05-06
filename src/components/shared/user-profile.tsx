@@ -36,6 +36,7 @@ export const UserProfile = ({ name, image, username }: UserProfileProps) => {
                 src={image}
                 alt="user profile"
                 fill
+                sizes="32px"
                 className="object-cover object-center"
               />
             ) : (

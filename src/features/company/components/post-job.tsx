@@ -9,18 +9,37 @@ export const PostJob = () => {
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handlePost = async () => {
-    await fetch("/api/company/jobs", {
-      method: "POST",
-      body: JSON.stringify({
-        title,
-        company,
-        description,
-      }),
-    });
+    setLoading(true);
 
-    router.refresh();
+    try {
+      const response = await fetch("/api/company/jobs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          company,
+          description,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        alert(errorText || "Failed to post job");
+        return;
+      }
+
+      alert("Job successfully posted");
+      router.refresh();
+    } catch (error) {
+      alert("Network error while posting job");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,9 +68,10 @@ export const PostJob = () => {
 
       <button
         onClick={handlePost}
+        disabled={loading}
         className="bg-black text-white px-4 py-2"
       >
-        Post Job
+        {loading ? "Posting..." : "Post Job"}
       </button>
     </div>
   );

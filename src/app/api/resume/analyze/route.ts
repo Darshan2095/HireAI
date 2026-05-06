@@ -50,6 +50,9 @@ export async function POST(req: Request) {
       skills: result.skills,
       technologies: result.technologies,
       experience: result.experience,
+      improvements: result.improvements,
+      keywords: result.keywords,
+      optimized: result.optimized,
     } as unknown as Parameters<typeof prisma.resume.update>[0]["data"];
 
     await prisma.resume.update({

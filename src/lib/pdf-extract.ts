@@ -5,6 +5,14 @@ type PdfTextItem = { R: PdfTextRun[] };
 type PdfPage = { Texts: PdfTextItem[] };
 type PdfParseResult = { Pages: PdfPage[] };
 
+const safeDecodeText = (value: string) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 export const extractTextFromPDF = async (buffer: Buffer) => {
   return new Promise<string>((resolve, reject) => {
     const pdfParser = new PDFParser();
@@ -16,7 +24,11 @@ export const extractTextFromPDF = async (buffer: Buffer) => {
 
       pdfData.Pages.forEach((page) => {
         page.Texts.forEach((textItem) => {
-          text += decodeURIComponent(textItem.R[0].T) + " ";
+          const run = textItem.R[0]?.T;
+
+          if (typeof run === "string" && run.length > 0) {
+            text += safeDecodeText(run) + " ";
+          }
         });
       });
 

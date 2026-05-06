@@ -11,31 +11,42 @@ export const ourFileRouter = {
     },
   })
     .middleware(async () => {
-      const session = await auth();
+      try {
+        const session = await auth();
 
-      if (!session?.user?.email) {
-        throw new Error("Unauthorized");
+        if (!session?.user?.email) {
+          console.error("[UploadThing] No session found");
+          throw new Error("Unauthorized - No active session");
+        }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: session.user.email,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (!user) {
+          console.error("[UploadThing] User not found for email:", session.user.email);
+          throw new Error("User not found in database");
+        }
+
+        console.log("[UploadThing] Middleware auth successful for user:", user.id);
+
+        return {
+          userId: user.id,
+        };
+      } catch (error) {
+        console.error("[UploadThing] Middleware error:", error);
+        throw error;
       }
-
-      const user = await prisma.user.findUnique({
-        where: {
-          email: session.user.email,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      return {
-        userId: user.id,
-      };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       try {
+        console.log("[UploadThing] Upload complete, saving resume:", { fileName: file.name, userId: metadata.userId });
+        
         // Only save resume metadata
         const createdResume = await prisma.resume.create({
           data: {
@@ -45,6 +56,8 @@ export const ourFileRouter = {
           },
         });
 
+        console.log("[UploadThing] Resume saved successfully:", createdResume.id);
+
         // Return resume ID for further processing
         return {
           resumeId: createdResume.id,
@@ -52,12 +65,8 @@ export const ourFileRouter = {
         };
 
       } catch (error) {
-        console.error("Resume upload save failed:", error);
-
-        return {
-          resumeId: null,
-          fileUrl: null,
-        };
+        console.error("[UploadThing] Resume upload save failed:", error);
+        throw error; // Re-throw to surface the error to the client
       }
     }),
 } satisfies FileRouter;
